@@ -103,6 +103,12 @@ Common artifact patterns:
 - **specs/<capability>/spec.md**: Create one spec per capability listed in the proposal's Capabilities section (use the capability name, not the change name).
 - **design.md**: Document technical decisions, architecture, and implementation approach.
 - **tasks.md**: Break down implementation into checkboxed tasks.
+  - Each task must be verifiable — you know exactly when it's done
+  - Include file paths where changes are expected
+  - Reference corresponding spec requirements (e.g., "Req: <capability>/<requirement>")
+  - Order by priority: P0 (core) first, P1 (supporting) second
+  - Include explicit test tasks (e.g., "Write tests for X")
+  - Group related tasks under numbered headings
 
 For other schemas, follow the \`instruction\` field from the CLI output.
 
@@ -222,6 +228,12 @@ Common artifact patterns:
 - **specs/<capability>/spec.md**: Create one spec per capability listed in the proposal's Capabilities section (use the capability name, not the change name).
 - **design.md**: Document technical decisions, architecture, and implementation approach.
 - **tasks.md**: Break down implementation into checkboxed tasks.
+  - Each task must be verifiable — you know exactly when it's done
+  - Include file paths where changes are expected
+  - Reference corresponding spec requirements (e.g., "Req: <capability>/<requirement>")
+  - Order by priority: P0 (core) first, P1 (supporting) second
+  - Include explicit test tasks (e.g., "Write tests for X")
+  - Group related tasks under numbered headings
 
 For other schemas, follow the \`instruction\` field from the CLI output.
 

@@ -102,6 +102,28 @@ After completing all artifacts, summarize:
   - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
   - These guide what you write, but should never appear in the output
 
+**Task Structure Guidelines (for tasks.md artifact)**
+
+When creating the tasks artifact, ensure each task:
+- Has a clear, verifiable completion criterion
+- References the spec requirement it implements (e.g., "Req: user-auth/Login Flow")
+- Includes expected file paths where changes will occur
+- Is ordered: P0 (core functionality) tasks first, then P1 (supporting/edge cases)
+- Includes explicit test tasks alongside implementation tasks
+
+Example enhanced task format:
+\\\`\\\`\\\`
+## 1. Core Authentication (P0)
+
+- [ ] 1.1 Create auth middleware — \\\`src/middleware/auth.ts\\\` — Req: user-auth/Session Management
+- [ ] 1.2 Implement login endpoint — \\\`src/routes/auth.ts\\\` — Req: user-auth/Login Flow
+- [ ] 1.3 Write tests for login flow — \\\`tests/auth.test.ts\\\` — Scenario: Successful Login
+
+## 2. Edge Cases & Error Handling (P1)
+
+- [ ] 2.1 Handle expired tokens — \\\`src/middleware/auth.ts\\\` — Scenario: Token Expired
+\\\`\\\`\\\`
+
 **Guardrails**
 - Create ALL artifacts needed for implementation (as defined by schema's \`apply.requires\`)
 - Always read dependency artifacts before creating a new one
@@ -212,6 +234,28 @@ After completing all artifacts, summarize:
 - **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
   - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
   - These guide what you write, but should never appear in the output
+
+**Task Structure Guidelines (for tasks.md artifact)**
+
+When creating the tasks artifact, ensure each task:
+- Has a clear, verifiable completion criterion
+- References the spec requirement it implements (e.g., "Req: user-auth/Login Flow")
+- Includes expected file paths where changes will occur
+- Is ordered: P0 (core functionality) tasks first, then P1 (supporting/edge cases)
+- Includes explicit test tasks alongside implementation tasks
+
+Example enhanced task format:
+\\\`\\\`\\\`
+## 1. Core Authentication (P0)
+
+- [ ] 1.1 Create auth middleware — \\\`src/middleware/auth.ts\\\` — Req: user-auth/Session Management
+- [ ] 1.2 Implement login endpoint — \\\`src/routes/auth.ts\\\` — Req: user-auth/Login Flow
+- [ ] 1.3 Write tests for login flow — \\\`tests/auth.test.ts\\\` — Scenario: Successful Login
+
+## 2. Edge Cases & Error Handling (P1)
+
+- [ ] 2.1 Handle expired tokens — \\\`src/middleware/auth.ts\\\` — Scenario: Token Expired
+\\\`\\\`\\\`
 
 **Guardrails**
 - Create ALL artifacts needed for implementation (as defined by schema's \`apply.requires\`)

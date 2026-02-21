@@ -81,7 +81,14 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
    If the user explicitly asked to skip validation, append \`--no-validate\`.
    Surface the CLI result, including archive path and spec sync outcome.
 
-6. **Display summary**
+6. **Post-archive verification**
+
+   After archive completes:
+   - If specs were synced: read \`openspec/specs/\` to confirm delta specs were applied correctly
+   - Verify the archive directory exists at expected path
+   - If verification fails: report the issue and suggest manual review
+
+7. **Display summary**
 
    Show archive completion summary including:
    - Change name
@@ -194,7 +201,14 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
    If the user explicitly asked to skip validation, append \`--no-validate\`.
    Surface the CLI result, including archive path and spec sync outcome.
 
-6. **Display summary**
+6. **Post-archive verification**
+
+   After archive completes:
+   - If specs were synced: read \`openspec/specs/\` to confirm delta specs were applied correctly
+   - Verify the archive directory exists at expected path
+   - If verification fails: report the issue and suggest manual review
+
+7. **Display summary**
 
    Show archive completion summary including:
    - Change name

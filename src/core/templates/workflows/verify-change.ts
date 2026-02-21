@@ -70,6 +70,17 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
        - Add CRITICAL issue: "Requirement not found: <requirement name>"
        - Recommendation: "Implement requirement X: <description>"
 
+   **Test Suite Verification**:
+   - Detect project test framework (jest, vitest, pytest, go test, cargo test, etc.)
+   - Run the full test suite: report pass/fail/skip counts
+   - If tests fail:
+     - Add CRITICAL issue for each failing test with file:line reference
+     - Recommendation: "Fix failing test: <test name> in <file>"
+   - If no tests exist for spec requirements:
+     - Add WARNING: "No automated tests found for requirement: <requirement name>"
+     - Recommendation: "Add test coverage for: <specific scenario>"
+   - If no test framework detected: note "No test framework found" as WARNING
+
 6. **Verify Correctness**
 
    **Requirement Implementation Mapping**:
@@ -88,6 +99,14 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
      - If scenario appears uncovered:
        - Add WARNING: "Scenario not covered: <scenario name>"
        - Recommendation: "Add test or implementation for scenario: <description>"
+
+   **Proof Artifact Verification**:
+   - For each WHEN/THEN scenario in delta specs:
+     - Search for test files that cover this scenario
+     - Check test assertions match the THEN conditions
+     - If scenario has no corresponding test:
+       - Add WARNING: "Scenario untested: <scenario name>"
+       - Recommendation: "Add test in <suggested file> covering WHEN <condition> THEN <expected>"
 
 7. **Verify Coherence**
 
@@ -119,6 +138,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
    | Completeness | X/Y tasks, N reqs|
    | Correctness  | M/N reqs covered |
    | Coherence    | Followed/Issues  |
+   | Tests        | P pass, F fail   |
    \`\`\`
 
    **Issues by Priority**:
@@ -139,9 +159,9 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
       - Each with specific recommendation
 
    **Final Assessment**:
-   - If CRITICAL issues: "X critical issue(s) found. Fix before archiving."
-   - If only warnings: "No critical issues. Y warning(s) to consider. Ready for archive (with noted improvements)."
-   - If all clear: "All checks passed. Ready for archive."
+   - If CRITICAL issues OR test failures: "X critical issue(s) found. Fix before archiving."
+   - If only warnings: "No critical issues. Tests pass. Y warning(s) to consider. Ready for archive (with noted improvements)."
+   - If all clear AND all tests pass: "All checks passed. All tests green. Ready for archive."
 
 **Verification Heuristics**
 
@@ -239,6 +259,17 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
        - Add CRITICAL issue: "Requirement not found: <requirement name>"
        - Recommendation: "Implement requirement X: <description>"
 
+   **Test Suite Verification**:
+   - Detect project test framework (jest, vitest, pytest, go test, cargo test, etc.)
+   - Run the full test suite: report pass/fail/skip counts
+   - If tests fail:
+     - Add CRITICAL issue for each failing test with file:line reference
+     - Recommendation: "Fix failing test: <test name> in <file>"
+   - If no tests exist for spec requirements:
+     - Add WARNING: "No automated tests found for requirement: <requirement name>"
+     - Recommendation: "Add test coverage for: <specific scenario>"
+   - If no test framework detected: note "No test framework found" as WARNING
+
 6. **Verify Correctness**
 
    **Requirement Implementation Mapping**:
@@ -257,6 +288,14 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
      - If scenario appears uncovered:
        - Add WARNING: "Scenario not covered: <scenario name>"
        - Recommendation: "Add test or implementation for scenario: <description>"
+
+   **Proof Artifact Verification**:
+   - For each WHEN/THEN scenario in delta specs:
+     - Search for test files that cover this scenario
+     - Check test assertions match the THEN conditions
+     - If scenario has no corresponding test:
+       - Add WARNING: "Scenario untested: <scenario name>"
+       - Recommendation: "Add test in <suggested file> covering WHEN <condition> THEN <expected>"
 
 7. **Verify Coherence**
 
@@ -288,6 +327,7 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
    | Completeness | X/Y tasks, N reqs|
    | Correctness  | M/N reqs covered |
    | Coherence    | Followed/Issues  |
+   | Tests        | P pass, F fail   |
    \`\`\`
 
    **Issues by Priority**:
@@ -308,9 +348,9 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
       - Each with specific recommendation
 
    **Final Assessment**:
-   - If CRITICAL issues: "X critical issue(s) found. Fix before archiving."
-   - If only warnings: "No critical issues. Y warning(s) to consider. Ready for archive (with noted improvements)."
-   - If all clear: "All checks passed. Ready for archive."
+   - If CRITICAL issues OR test failures: "X critical issue(s) found. Fix before archiving."
+   - If only warnings: "No critical issues. Tests pass. Y warning(s) to consider. Ready for archive (with noted improvements)."
+   - If all clear AND all tests pass: "All checks passed. All tests green. Ready for archive."
 
 **Verification Heuristics**
 

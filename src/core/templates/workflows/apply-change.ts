@@ -56,7 +56,23 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - **spec-driven**: proposal, specs, design, tasks
    - Other schemas: follow the contextFiles from CLI output
 
-5. **Show current progress**
+5. **Create context anchor**
+
+   After reading context files, output a brief **Context Anchor** summary using the files that exist for the current schema.
+   If a section has no corresponding context file, mark it as \`N/A\` instead of guessing.
+
+   \\\`\\\`\\\`
+   ## Context Anchor
+   **Requirements**: <from specs/requirements docs; or N/A>
+   **Design Decisions**: <from design/architecture docs; or N/A>
+   **Scope Boundaries**: <from proposal/planning docs; or N/A>
+   **Test Strategy**: <test framework + test location convention; or N/A>
+   \\\`\\\`\\\`
+
+   This anchor prevents context drift in long conversations.
+   If at any point you're uncertain about a requirement, re-read the relevant context file rather than guessing.
+
+6. **Show current progress**
 
    Display:
    - Schema being used
@@ -64,22 +80,43 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-6. **Implement tasks (loop until done or blocked)**
+7. **Implement tasks with a test-first approach (loop until done or blocked)**
 
    For each pending task:
-   - Show which task is being worked on
-   - Make the code changes required
-   - Keep changes minimal and focused
-   - Mark task complete in the tasks file: \`- [ ]\` → \`- [x]\`
-   - Continue to next task
+
+   - If the task changes behavior, follow the **Red-Green-Refactor** cycle:
+     a. **Red (Write Tests First)**:
+        - Identify what the task requires based on specs and design
+        - Write test(s) that validate the expected behavior
+        - Run tests — confirm they FAIL (proving the feature doesn't exist yet)
+        - If no test framework is configured: set one up as the first task, or ask the user
+     b. **Green (Minimal Implementation)**:
+        - Write the minimum code needed to make tests pass
+        - Run tests — confirm they PASS
+        - Do NOT add extra functionality beyond what the test requires
+     c. **Refactor (Clean Up)**:
+        - Improve code quality without changing behavior
+        - Run tests — confirm they still PASS
+        - Only refactor if genuinely needed; skip for trivial tasks
+
+   - If the task is non-behavioral (docs, config, scaffolding, mechanical refactor):
+     a. Make the minimal required change
+     b. Run the most relevant validation available (lint, typecheck, build, smoke checks)
+     c. Record why no new automated test was added
+
+   d. **Mark complete**: \`- [ ]\` → \`- [x]\`
+   e. Continue to next task
+
+   **Regression check**: After every 3 tasks, run a broader validation pass (full test suite when available; otherwise lint/typecheck/build).
 
    **Pause if:**
    - Task is unclear → ask for clarification
+   - Test is hard to write → may indicate unclear requirements, re-read spec
    - Implementation reveals a design issue → suggest updating artifacts
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-7. **On completion or pause, show status**
+8. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session
@@ -93,11 +130,17 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
 ## Implementing: <change-name> (schema: <schema-name>)
 
 Working on task 3/7: <task description>
-[...implementation happening...]
+  RED: Writing test for <expected behavior>...
+  Running tests... 1 failing ✓ (expected)
+  GREEN: Implementing <minimal code>...
+  Running tests... all passing ✓
 ✓ Task complete
 
 Working on task 4/7: <task description>
-[...implementation happening...]
+  RED: Writing test for <expected behavior>...
+  Running tests... 1 failing ✓ (expected)
+  GREEN: Implementing <minimal code>...
+  Running tests... all passing ✓
 ✓ Task complete
 \`\`\`
 
@@ -139,6 +182,10 @@ What would you like to do?
 \`\`\`
 
 **Guardrails**
+- Prefer TDD for behavior-changing tasks; if a task is non-behavioral, explicitly document the alternate validation used
+- If behavior-changing work has no test framework, set one up as the first task (or ask user)
+- Run validation after each task completion (tests when present; otherwise best available checks)
+- Each behavior-changing completed task should have at least one automated test proving it works
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
 - If task is ambiguous, pause and ask before implementing
@@ -213,7 +260,23 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
    - **spec-driven**: proposal, specs, design, tasks
    - Other schemas: follow the contextFiles from CLI output
 
-5. **Show current progress**
+5. **Create context anchor**
+
+   After reading context files, output a brief **Context Anchor** summary using the files that exist for the current schema.
+   If a section has no corresponding context file, mark it as \`N/A\` instead of guessing.
+
+   \\\`\\\`\\\`
+   ## Context Anchor
+   **Requirements**: <from specs/requirements docs; or N/A>
+   **Design Decisions**: <from design/architecture docs; or N/A>
+   **Scope Boundaries**: <from proposal/planning docs; or N/A>
+   **Test Strategy**: <test framework + test location convention; or N/A>
+   \\\`\\\`\\\`
+
+   This anchor prevents context drift in long conversations.
+   If at any point you're uncertain about a requirement, re-read the relevant context file rather than guessing.
+
+6. **Show current progress**
 
    Display:
    - Schema being used
@@ -221,22 +284,43 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-6. **Implement tasks (loop until done or blocked)**
+7. **Implement tasks with a test-first approach (loop until done or blocked)**
 
    For each pending task:
-   - Show which task is being worked on
-   - Make the code changes required
-   - Keep changes minimal and focused
-   - Mark task complete in the tasks file: \`- [ ]\` → \`- [x]\`
-   - Continue to next task
+
+   - If the task changes behavior, follow the **Red-Green-Refactor** cycle:
+     a. **Red (Write Tests First)**:
+        - Identify what the task requires based on specs and design
+        - Write test(s) that validate the expected behavior
+        - Run tests — confirm they FAIL (proving the feature doesn't exist yet)
+        - If no test framework is configured: set one up as the first task, or ask the user
+     b. **Green (Minimal Implementation)**:
+        - Write the minimum code needed to make tests pass
+        - Run tests — confirm they PASS
+        - Do NOT add extra functionality beyond what the test requires
+     c. **Refactor (Clean Up)**:
+        - Improve code quality without changing behavior
+        - Run tests — confirm they still PASS
+        - Only refactor if genuinely needed; skip for trivial tasks
+
+   - If the task is non-behavioral (docs, config, scaffolding, mechanical refactor):
+     a. Make the minimal required change
+     b. Run the most relevant validation available (lint, typecheck, build, smoke checks)
+     c. Record why no new automated test was added
+
+   d. **Mark complete**: \`- [ ]\` → \`- [x]\`
+   e. Continue to next task
+
+   **Regression check**: After every 3 tasks, run a broader validation pass (full test suite when available; otherwise lint/typecheck/build).
 
    **Pause if:**
    - Task is unclear → ask for clarification
+   - Test is hard to write → may indicate unclear requirements, re-read spec
    - Implementation reveals a design issue → suggest updating artifacts
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-7. **On completion or pause, show status**
+8. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session
@@ -250,11 +334,17 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
 ## Implementing: <change-name> (schema: <schema-name>)
 
 Working on task 3/7: <task description>
-[...implementation happening...]
+  RED: Writing test for <expected behavior>...
+  Running tests... 1 failing ✓ (expected)
+  GREEN: Implementing <minimal code>...
+  Running tests... all passing ✓
 ✓ Task complete
 
 Working on task 4/7: <task description>
-[...implementation happening...]
+  RED: Writing test for <expected behavior>...
+  Running tests... 1 failing ✓ (expected)
+  GREEN: Implementing <minimal code>...
+  Running tests... all passing ✓
 ✓ Task complete
 \`\`\`
 
@@ -296,6 +386,10 @@ What would you like to do?
 \`\`\`
 
 **Guardrails**
+- Prefer TDD for behavior-changing tasks; if a task is non-behavioral, explicitly document the alternate validation used
+- If behavior-changing work has no test framework, set one up as the first task (or ask user)
+- Run validation after each task completion (tests when present; otherwise best available checks)
+- Each behavior-changing completed task should have at least one automated test proving it works
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
 - If task is ambiguous, pause and ask before implementing

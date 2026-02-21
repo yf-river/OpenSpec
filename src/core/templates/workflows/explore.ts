@@ -247,6 +247,38 @@ You: That changes everything.
 
 ---
 
+## Structured Output (Optional)
+
+When the exploration produces concrete, reusable insights, offer to produce one or more of these:
+
+**Architecture Map** (if codebase was explored):
+\\\`\\\`\\\`
+┌─────────────┐     ┌──────────────┐
+│  Module A    │────▶│  Module B    │
+│  (purpose)   │     │  (purpose)   │
+└─────────────┘     └──────────────┘
+\\\`\\\`\\\`
+- Key modules and responsibilities
+- Integration points relevant to the discussion
+- Conventions and patterns discovered
+
+**Decision Matrix** (if options were compared):
+| Option | Pros | Cons | Complexity | Recommendation |
+|--------|------|------|------------|----------------|
+
+**Requirements Sketch** (if requirements emerged):
+- Must-have: ...
+- Nice-to-have: ...
+- Constraints: ...
+- Open questions: ...
+
+**Test Strategy Sketch** (if implementation approach discussed):
+- What to test (unit / integration / e2e)
+- Test framework recommendation
+- Key scenarios to cover
+
+---
+
 ## Ending Discovery
 
 There's no required ending. Discovery might:
@@ -438,6 +470,38 @@ If the user mentions a change or you detect one is relevant:
 - Reach a conclusion
 - Stay on topic if a tangent is valuable
 - Be brief (this is thinking time)
+
+---
+
+## Structured Output (Optional)
+
+When the exploration produces concrete, reusable insights, offer to produce one or more of these:
+
+**Architecture Map** (if codebase was explored):
+\\\`\\\`\\\`
+┌─────────────┐     ┌──────────────┐
+│  Module A    │────▶│  Module B    │
+│  (purpose)   │     │  (purpose)   │
+└─────────────┘     └──────────────┘
+\\\`\\\`\\\`
+- Key modules and responsibilities
+- Integration points relevant to the discussion
+- Conventions and patterns discovered
+
+**Decision Matrix** (if options were compared):
+| Option | Pros | Cons | Complexity | Recommendation |
+|--------|------|------|------------|----------------|
+
+**Requirements Sketch** (if requirements emerged):
+- Must-have: ...
+- Nice-to-have: ...
+- Constraints: ...
+- Open questions: ...
+
+**Test Strategy Sketch** (if implementation approach discussed):
+- What to test (unit / integration / e2e)
+- Test framework recommendation
+- Key scenarios to cover
 
 ---
 

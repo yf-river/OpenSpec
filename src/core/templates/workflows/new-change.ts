@@ -66,6 +66,11 @@ After completing the steps, summarize:
 - The template for the first artifact
 - Prompt: "Ready to create the first artifact? Just describe what this change is about and I'll draft it, or ask me to continue."
 
+**Workflow Navigation:**
+- Continue with artifacts one by one (recommended for complex changes)
+- Generate all artifacts at once with \`/opsx:propose <name>\` (for simpler changes)
+- Go back to explore mode if requirements are unclear
+
 **Guardrails**
 - Do NOT create any artifacts yet - just show the instructions
 - Do NOT advance beyond showing the first artifact template
@@ -139,6 +144,11 @@ After completing the steps, summarize:
 - Current status (0/N artifacts complete)
 - The template for the first artifact
 - Prompt: "Ready to create the first artifact? Run \`/opsx:continue\` or just describe what this change is about and I'll draft it."
+
+**Workflow Navigation:**
+- \`/opsx:continue\` — Create artifacts one by one (recommended for complex changes)
+- \`/opsx:propose <name>\` — Generate all artifacts at once (for simpler changes)
+- \`/opsx:explore\` — Go back to thinking mode if requirements are unclear
 
 **Guardrails**
 - Do NOT create any artifacts yet - just show the instructions

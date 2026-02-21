@@ -10,7 +10,6 @@ import { amazonQAdapter } from './adapters/amazon-q.js';
 import { antigravityAdapter } from './adapters/antigravity.js';
 import { auggieAdapter } from './adapters/auggie.js';
 import { claudeAdapter } from './adapters/claude.js';
-import { claudeInternalAdapter } from './adapters/claude-internal.js';
 import { clineAdapter } from './adapters/cline.js';
 import { codexAdapter } from './adapters/codex.js';
 import { codebuddyAdapter } from './adapters/codebuddy.js';
@@ -42,7 +41,6 @@ export class CommandAdapterRegistry {
     CommandAdapterRegistry.register(antigravityAdapter);
     CommandAdapterRegistry.register(auggieAdapter);
     CommandAdapterRegistry.register(claudeAdapter);
-    CommandAdapterRegistry.register(claudeInternalAdapter);
     CommandAdapterRegistry.register(clineAdapter);
     CommandAdapterRegistry.register(codexAdapter);
     CommandAdapterRegistry.register(codebuddyAdapter);

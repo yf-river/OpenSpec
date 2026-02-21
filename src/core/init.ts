@@ -519,14 +519,20 @@ export class InitCommand {
     for (const tool of tools) {
       const spinner = ora(`Setting up ${tool.name}...`).start();
 
+      // Claude 系工具只生成 commands，不生成 skills（避免斜杠菜单重复）
+      const isClaudeTool = tool.value === 'claude';
+      const toolGenerateSkills = isClaudeTool ? false : shouldGenerateSkills;
+      const toolGenerateCommands = isClaudeTool ? true : shouldGenerateCommands;
+      const toolSkillTemplates = toolGenerateSkills ? skillTemplates : [];
+
       try {
         // Generate skill files if delivery includes skills
-        if (shouldGenerateSkills) {
+        if (toolGenerateSkills) {
           // Use tool-specific skillsDir
           const skillsDir = path.join(projectPath, tool.skillsDir, 'skills');
 
           // Create skill directories and SKILL.md files
-          for (const { template, dirName } of skillTemplates) {
+          for (const { template, dirName } of toolSkillTemplates) {
             const skillDir = path.join(skillsDir, dirName);
             const skillFile = path.join(skillDir, 'SKILL.md');
 
@@ -539,13 +545,13 @@ export class InitCommand {
             await FileSystemUtils.writeFile(skillFile, skillContent);
           }
         }
-        if (!shouldGenerateSkills) {
+        if (!toolGenerateSkills) {
           const skillsDir = path.join(projectPath, tool.skillsDir, 'skills');
           removedSkillCount += await this.removeSkillDirs(skillsDir);
         }
 
         // Generate commands if delivery includes commands
-        if (shouldGenerateCommands) {
+        if (toolGenerateCommands) {
           const adapter = CommandAdapterRegistry.get(tool.value);
           if (adapter) {
             const generatedCommands = generateCommands(commandContents, adapter);
@@ -558,7 +564,7 @@ export class InitCommand {
             commandsSkipped.push(tool.value);
           }
         }
-        if (!shouldGenerateCommands) {
+        if (!toolGenerateCommands) {
           removedCommandCount += await this.removeCommandFiles(projectPath, tool.value);
         }
 
@@ -642,7 +648,7 @@ export class InitCommand {
       console.log(`Refreshed: ${results.refreshedTools.map((t) => t.name).join(', ')}`);
     }
 
-    // Show counts (respecting profile filter)
+    // Show counts (respecting profile filter and per-tool overrides)
     const successfulTools = [...results.createdTools, ...results.refreshedTools];
     if (successfulTools.length > 0) {
       const globalConfig = getGlobalConfig();
@@ -650,14 +656,18 @@ export class InitCommand {
       const delivery: Delivery = globalConfig.delivery ?? 'both';
       const workflows = getProfileWorkflows(profile, globalConfig.workflows);
       const toolDirs = [...new Set(successfulTools.map((t) => t.skillsDir))].join(', ');
-      const skillCount = delivery !== 'commands' ? getSkillTemplates(workflows).length : 0;
-      const commandCount = delivery !== 'skills' ? getCommandContents(workflows).length : 0;
-      if (skillCount > 0 && commandCount > 0) {
-        console.log(`${skillCount} skills and ${commandCount} commands in ${toolDirs}/`);
-      } else if (skillCount > 0) {
-        console.log(`${skillCount} skills in ${toolDirs}/`);
-      } else if (commandCount > 0) {
-        console.log(`${commandCount} commands in ${toolDirs}/`);
+
+      // Claude 系工具只生成 commands，需要按实际情况统计
+      const hasClaudeOnly = successfulTools.every((t) => t.value === 'claude' || t.value === 'claude-internal');
+      const effectiveSkillCount = hasClaudeOnly ? 0 : (delivery !== 'commands' ? getSkillTemplates(workflows).length : 0);
+      const effectiveCommandCount = delivery !== 'skills' ? getCommandContents(workflows).length : 0;
+
+      if (effectiveSkillCount > 0 && effectiveCommandCount > 0) {
+        console.log(`${effectiveSkillCount} skills and ${effectiveCommandCount} commands in ${toolDirs}/`);
+      } else if (effectiveSkillCount > 0) {
+        console.log(`${effectiveSkillCount} skills in ${toolDirs}/`);
+      } else if (effectiveCommandCount > 0) {
+        console.log(`${effectiveCommandCount} commands in ${toolDirs}/`);
       }
     }
 

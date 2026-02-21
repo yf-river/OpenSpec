@@ -64,24 +64,23 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
    - If changes needed: "Sync now (recommended)", "Archive without syncing"
    - If already synced: "Archive now", "Sync anyway", "Cancel"
 
-   If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
+   If user chooses sync, proceed with normal archive (without \`--skip-specs\`) so archive applies spec updates.
+   If user chooses to skip sync, archive with \`--skip-specs\`.
 
-5. **Perform the archive**
+5. **Perform the archive via CLI**
 
-   Create the archive directory if it doesn't exist:
-   \`\`\`bash
-   mkdir -p openspec/changes/archive
-   \`\`\`
-
-   Generate target name using current date: \`YYYY-MM-DD-<change-name>\`
-
-   **Check if target already exists:**
-   - If yes: Fail with error, suggest renaming existing archive or using different date
-   - If no: Move the change directory to archive
+   Execute one of:
 
    \`\`\`bash
-   mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
+   # Sync specs during archive (default)
+   openspec archive "<name>" --yes
+
+   # Skip spec sync when user requested "Archive without syncing"
+   openspec archive "<name>" --yes --skip-specs
    \`\`\`
+
+   If the user explicitly asked to skip validation, append \`--no-validate\`.
+   Surface the CLI result, including archive path and spec sync outcome.
 
 6. **Display summary**
 
@@ -109,9 +108,8 @@ All artifacts complete. All tasks complete.
 - Always prompt for change selection if not provided
 - Use artifact graph (openspec status --json) for completion checking
 - Don't block archive on warnings - just inform and confirm
-- Preserve .openspec.yaml when moving to archive (it moves with the directory)
+- Preserve .openspec.yaml as part of the archived change
 - Show clear summary of what happened
-- If sync is requested, use openspec-sync-specs approach (agent-driven)
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting`,
     license: 'MIT',
     compatibility: 'Requires openspec CLI.',
@@ -179,24 +177,23 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
    - If changes needed: "Sync now (recommended)", "Archive without syncing"
    - If already synced: "Archive now", "Sync anyway", "Cancel"
 
-   If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
+   If user chooses sync, proceed with normal archive (without \`--skip-specs\`) so archive applies spec updates.
+   If user chooses to skip sync, archive with \`--skip-specs\`.
 
-5. **Perform the archive**
+5. **Perform the archive via CLI**
 
-   Create the archive directory if it doesn't exist:
-   \`\`\`bash
-   mkdir -p openspec/changes/archive
-   \`\`\`
-
-   Generate target name using current date: \`YYYY-MM-DD-<change-name>\`
-
-   **Check if target already exists:**
-   - If yes: Fail with error, suggest renaming existing archive or using different date
-   - If no: Move the change directory to archive
+   Execute one of:
 
    \`\`\`bash
-   mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
+   # Sync specs during archive (default)
+   openspec archive "<name>" --yes
+
+   # Skip spec sync when user requested "Archive without syncing"
+   openspec archive "<name>" --yes --skip-specs
    \`\`\`
+
+   If the user explicitly asked to skip validation, append \`--no-validate\`.
+   Surface the CLI result, including archive path and spec sync outcome.
 
 6. **Display summary**
 
@@ -271,9 +268,8 @@ Target archive directory already exists.
 - Always prompt for change selection if not provided
 - Use artifact graph (openspec status --json) for completion checking
 - Don't block archive on warnings - just inform and confirm
-- Preserve .openspec.yaml when moving to archive (it moves with the directory)
+- Preserve .openspec.yaml as part of the archived change
 - Show clear summary of what happened
-- If sync is requested, use the Skill tool to invoke \`openspec-sync-specs\` (agent-driven)
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting`
   };
 }

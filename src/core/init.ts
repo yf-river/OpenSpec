@@ -65,12 +65,8 @@ const WORKFLOW_TO_SKILL_DIR: Record<string, string> = {
   'new': 'openspec-new-change',
   'continue': 'openspec-continue-change',
   'apply': 'openspec-apply-change',
-  'ff': 'openspec-ff-change',
-  'sync': 'openspec-sync-specs',
   'archive': 'openspec-archive-change',
-  'bulk-archive': 'openspec-bulk-archive-change',
   'verify': 'openspec-verify-change',
-  'onboard': 'openspec-onboard',
   'propose': 'openspec-propose',
 };
 
@@ -711,8 +707,8 @@ export class InitCommand {
 
     // Links
     console.log();
-    console.log(`Learn more: ${chalk.cyan('https://github.com/Fission-AI/OpenSpec')}`);
-    console.log(`Feedback:   ${chalk.cyan('https://github.com/Fission-AI/OpenSpec/issues')}`);
+    console.log(`Learn more: ${chalk.cyan('https://github.com/yf-river/OpenSpec')}`);
+    console.log(`Feedback:   ${chalk.cyan('https://github.com/yf-river/OpenSpec/issues')}`);
 
     // Restart instruction if any tools were configured
     if (results.createdTools.length > 0 || results.refreshedTools.length > 0) {

@@ -16,12 +16,8 @@ export const SKILL_NAMES = [
   'openspec-new-change',
   'openspec-continue-change',
   'openspec-apply-change',
-  'openspec-ff-change',
-  'openspec-sync-specs',
   'openspec-archive-change',
-  'openspec-bulk-archive-change',
   'openspec-verify-change',
-  'openspec-onboard',
   'openspec-propose',
 ] as const;
 
@@ -35,12 +31,8 @@ export const COMMAND_IDS = [
   'new',
   'continue',
   'apply',
-  'ff',
-  'sync',
   'archive',
-  'bulk-archive',
   'verify',
-  'onboard',
   'propose',
 ] as const;
 

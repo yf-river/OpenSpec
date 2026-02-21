@@ -8,14 +8,9 @@ import { UpdateCommand } from '../core/update.js';
 import { ListCommand } from '../core/list.js';
 import { ArchiveCommand } from '../core/archive.js';
 import { ViewCommand } from '../core/view.js';
-import { registerSpecCommand } from '../commands/spec.js';
-import { ChangeCommand } from '../commands/change.js';
 import { ValidateCommand } from '../commands/validate.js';
 import { ShowCommand } from '../commands/show.js';
-import { CompletionCommand } from '../commands/completion.js';
-import { FeedbackCommand } from '../commands/feedback.js';
 import { registerConfigCommand } from '../commands/config.js';
-import { registerSchemaCommand } from '../commands/schema.js';
 import {
   statusCommand,
   instructionsCommand,
@@ -30,31 +25,10 @@ import {
   type SchemasOptions,
   type NewChangeOptions,
 } from '../commands/workflow/index.js';
-import { maybeShowTelemetryNotice, trackCommand, shutdown } from '../telemetry/index.js';
 
 const program = new Command();
 const require = createRequire(import.meta.url);
 const { version } = require('../../package.json');
-
-/**
- * Get the full command path for nested commands.
- * For example: 'change show' -> 'change:show'
- */
-function getCommandPath(command: Command): string {
-  const names: string[] = [];
-  let current: Command | null = command;
-
-  while (current) {
-    const name = current.name();
-    // Skip the root 'openspec' command
-    if (name && name !== 'openspec') {
-      names.unshift(name);
-    }
-    current = current.parent;
-  }
-
-  return names.join(':') || 'openspec';
-}
 
 program
   .name('openspec')
@@ -64,27 +38,12 @@ program
 // Global options
 program.option('--no-color', 'Disable color output');
 
-// Apply global flags and telemetry before any command runs
-// Note: preAction receives (thisCommand, actionCommand) where:
-// - thisCommand: the command where hook was added (root program)
-// - actionCommand: the command actually being executed (subcommand)
+// Apply global flags before any command runs
 program.hook('preAction', async (thisCommand, actionCommand) => {
   const opts = thisCommand.opts();
   if (opts.color === false) {
     process.env.NO_COLOR = '1';
   }
-
-  // Show first-run telemetry notice (if not seen)
-  await maybeShowTelemetryNotice();
-
-  // Track command execution (use actionCommand to get the actual subcommand)
-  const commandPath = getCommandPath(actionCommand);
-  await trackCommand(commandPath, version);
-});
-
-// Shutdown telemetry after command completes
-program.hook('postAction', async () => {
-  await shutdown();
 });
 
 const availableToolIds = AI_TOOLS.filter((tool) => tool.skillsDir).map((tool) => tool.value);
@@ -126,28 +85,6 @@ program
       await initCommand.execute(targetPath);
     } catch (error) {
       console.log(); // Empty line for spacing
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
-    }
-  });
-
-// Hidden alias: 'experimental' -> 'init' for backwards compatibility
-program
-  .command('experimental', { hidden: true })
-  .description('Alias for init (deprecated)')
-  .option('--tool <tool-id>', 'Target AI tool (maps to --tools)')
-  .option('--no-interactive', 'Disable interactive prompts')
-  .action(async (options?: { tool?: string; noInteractive?: boolean }) => {
-    try {
-      console.log('Note: "openspec experimental" is deprecated. Use "openspec init" instead.');
-      const { InitCommand } = await import('../core/init.js');
-      const initCommand = new InitCommand({
-        tools: options?.tool,
-        interactive: options?.noInteractive === true ? false : undefined,
-      });
-      await initCommand.execute('.');
-    } catch (error) {
-      console.log();
       ora().fail(`Error: ${(error as Error).message}`);
       process.exit(1);
     }
@@ -203,68 +140,6 @@ program
     }
   });
 
-// Change command with subcommands
-const changeCmd = program
-  .command('change')
-  .description('Manage OpenSpec change proposals');
-
-// Deprecation notice for noun-based commands
-changeCmd.hook('preAction', () => {
-  console.error('Warning: The "openspec change ..." commands are deprecated. Prefer verb-first commands (e.g., "openspec list", "openspec validate --changes").');
-});
-
-changeCmd
-  .command('show [change-name]')
-  .description('Show a change proposal in JSON or markdown format')
-  .option('--json', 'Output as JSON')
-  .option('--deltas-only', 'Show only deltas (JSON only)')
-  .option('--requirements-only', 'Alias for --deltas-only (deprecated)')
-  .option('--no-interactive', 'Disable interactive prompts')
-  .action(async (changeName?: string, options?: { json?: boolean; requirementsOnly?: boolean; deltasOnly?: boolean; noInteractive?: boolean }) => {
-    try {
-      const changeCommand = new ChangeCommand();
-      await changeCommand.show(changeName, options);
-    } catch (error) {
-      console.error(`Error: ${(error as Error).message}`);
-      process.exitCode = 1;
-    }
-  });
-
-changeCmd
-  .command('list')
-  .description('List all active changes (DEPRECATED: use "openspec list" instead)')
-  .option('--json', 'Output as JSON')
-  .option('--long', 'Show id and title with counts')
-  .action(async (options?: { json?: boolean; long?: boolean }) => {
-    try {
-      console.error('Warning: "openspec change list" is deprecated. Use "openspec list".');
-      const changeCommand = new ChangeCommand();
-      await changeCommand.list(options);
-    } catch (error) {
-      console.error(`Error: ${(error as Error).message}`);
-      process.exitCode = 1;
-    }
-  });
-
-changeCmd
-  .command('validate [change-name]')
-  .description('Validate a change proposal')
-  .option('--strict', 'Enable strict validation mode')
-  .option('--json', 'Output validation report as JSON')
-  .option('--no-interactive', 'Disable interactive prompts')
-  .action(async (changeName?: string, options?: { strict?: boolean; json?: boolean; noInteractive?: boolean }) => {
-    try {
-      const changeCommand = new ChangeCommand();
-      await changeCommand.validate(changeName, options);
-      if (typeof process.exitCode === 'number' && process.exitCode !== 0) {
-        process.exit(process.exitCode);
-      }
-    } catch (error) {
-      console.error(`Error: ${(error as Error).message}`);
-      process.exitCode = 1;
-    }
-  });
-
 program
   .command('archive [change-name]')
   .description('Archive a completed change and update main specs')
@@ -282,9 +157,7 @@ program
     }
   });
 
-registerSpecCommand(program);
 registerConfigCommand(program);
-registerSchemaCommand(program);
 
 // Top-level validate command
 program
@@ -336,87 +209,8 @@ program
     }
   });
 
-// Feedback command
-program
-  .command('feedback <message>')
-  .description('Submit feedback about OpenSpec')
-  .option('--body <text>', 'Detailed description for the feedback')
-  .action(async (message: string, options?: { body?: string }) => {
-    try {
-      const feedbackCommand = new FeedbackCommand();
-      await feedbackCommand.execute(message, options);
-    } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
-    }
-  });
-
-// Completion command with subcommands
-const completionCmd = program
-  .command('completion')
-  .description('Manage shell completions for OpenSpec CLI');
-
-completionCmd
-  .command('generate [shell]')
-  .description('Generate completion script for a shell (outputs to stdout)')
-  .action(async (shell?: string) => {
-    try {
-      const completionCommand = new CompletionCommand();
-      await completionCommand.generate({ shell });
-    } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
-    }
-  });
-
-completionCmd
-  .command('install [shell]')
-  .description('Install completion script for a shell')
-  .option('--verbose', 'Show detailed installation output')
-  .action(async (shell?: string, options?: { verbose?: boolean }) => {
-    try {
-      const completionCommand = new CompletionCommand();
-      await completionCommand.install({ shell, verbose: options?.verbose });
-    } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
-    }
-  });
-
-completionCmd
-  .command('uninstall [shell]')
-  .description('Uninstall completion script for a shell')
-  .option('-y, --yes', 'Skip confirmation prompts')
-  .action(async (shell?: string, options?: { yes?: boolean }) => {
-    try {
-      const completionCommand = new CompletionCommand();
-      await completionCommand.uninstall({ shell, yes: options?.yes });
-    } catch (error) {
-      console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
-      process.exit(1);
-    }
-  });
-
-// Hidden command for machine-readable completion data
-program
-  .command('__complete <type>', { hidden: true })
-  .description('Output completion data in machine-readable format (internal use)')
-  .action(async (type: string) => {
-    try {
-      const completionCommand = new CompletionCommand();
-      await completionCommand.complete({ type });
-    } catch (error) {
-      // Silently fail for graceful shell completion experience
-      process.exitCode = 1;
-    }
-  });
-
 // ═══════════════════════════════════════════════════════════
-// Workflow Commands (formerly experimental)
+// Workflow Commands
 // ═══════════════════════════════════════════════════════════
 
 // Status command

@@ -138,3 +138,4 @@ project/
 - `openspec init` 会同时生成 skills（技能文件）和 commands（斜杠命令）
 - 变更归档后会移动到 `changes/archive/` 目录，增量规格会同步到主规格
 - 所有产物都是 Markdown 文件，可以手动编辑
+- `openspec instructions apply` 会自动感知变更目录下的过程文档并加入上下文（支持目录名：`过程文档`、`process-docs`、`process_docs`、`process-doc`、`worklogs`、`worklog`）

@@ -37,6 +37,15 @@ export interface ApplyInstructionsOptions {
   json?: boolean;
 }
 
+const PROCESS_DOC_DIR_CANDIDATES = [
+  '过程文档',
+  'process-docs',
+  'process_docs',
+  'process-doc',
+  'worklogs',
+  'worklog',
+];
+
 // -----------------------------------------------------------------------------
 // Artifact Instructions Command
 // -----------------------------------------------------------------------------
@@ -299,6 +308,82 @@ function artifactOutputExists(changeDir: string, generates: string): boolean {
   return fs.existsSync(fullPath);
 }
 
+function listMarkdownFilesRecursive(rootDir: string): string[] {
+  const files: string[] = [];
+  const stack = [rootDir];
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (!current) {
+      continue;
+    }
+
+    let entries: fs.Dirent[] = [];
+    try {
+      entries = fs.readdirSync(current, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+
+    for (const entry of entries) {
+      const entryPath = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(entryPath);
+        continue;
+      }
+      if (entry.isFile() && entry.name.toLowerCase().endsWith('.md')) {
+        files.push(entryPath);
+      }
+    }
+  }
+
+  return files;
+}
+
+function collectProcessDocContext(changeDir: string): Record<string, string> {
+  const context: Record<string, string> = {};
+  let index = 0;
+
+  for (const dirName of PROCESS_DOC_DIR_CANDIDATES) {
+    const absDir = path.join(changeDir, dirName);
+    if (!fs.existsSync(absDir) || !fs.statSync(absDir).isDirectory()) {
+      continue;
+    }
+
+    const markdownFiles = listMarkdownFilesRecursive(absDir);
+    if (markdownFiles.length === 0) {
+      continue;
+    }
+
+    const suffix = index === 0 ? '' : `${index + 1}`;
+    context[`processDocs${suffix}`] = path.join(absDir, '**/*.md');
+
+    const latestFile = markdownFiles
+      .map((filePath) => {
+        try {
+          return {
+            filePath,
+            mtimeMs: fs.statSync(filePath).mtimeMs,
+          };
+        } catch {
+          return {
+            filePath,
+            mtimeMs: 0,
+          };
+        }
+      })
+      .sort((a, b) => b.mtimeMs - a.mtimeMs)[0]?.filePath;
+
+    if (latestFile) {
+      context[`processDocsLatest${suffix}`] = latestFile;
+    }
+
+    index += 1;
+  }
+
+  return context;
+}
+
 /**
  * Generates apply instructions for implementing tasks from a change.
  * Schema-aware: reads apply phase configuration from schema to determine
@@ -339,6 +424,9 @@ export async function generateApplyInstructions(
       contextFiles[artifact.id] = path.join(changeDir, artifact.generates);
     }
   }
+
+  // Optionally include process docs (e.g. `过程文档/`) as additional runtime context.
+  Object.assign(contextFiles, collectProcessDocContext(changeDir));
 
   // Parse tasks if tracking file exists
   let tasks: TaskItem[] = [];
